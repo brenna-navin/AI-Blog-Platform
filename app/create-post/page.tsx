@@ -1,149 +1,85 @@
-"use client";
+import Link from "next/link";
+import posts from "../../data/posts.json";
 
-import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+type Post = {
+  title: string;
+  body: string;
+  tag: string;
+  imageUrl?: string | null;
+  date: string;
+  slug: string;
+  source?: "manual" | "automated";
+};
 
-const API_KEY = "my-secret-key";
+function getReadingTime(text: string) {
+  const wordsPerMinute = 200;
+  const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
+  const minutes = Math.max(1, Math.ceil(wordCount / wordsPerMinute));
+  return `${minutes} min read`;
+}
 
-export default function CreatePostPage() {
-  const router = useRouter();
-
-  const [title, setTitle] = useState("");
-  const [body, setBody] = useState("");
-  const [tag, setTag] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setError("");
-    setIsSubmitting(true);
-
-    try {
-      const res = await fetch("/api/posts", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${API_KEY}`,
-        },
-        body: JSON.stringify({
-          title,
-          body,
-          tag,
-          imageUrl: imageUrl.trim() || null,
-          source: "manual",
-        }),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to create post");
-      }
-
-      router.push("/");
-      router.refresh();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
+export default function HomePage() {
+  const allPosts = posts as Post[];
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#faf9f7] to-white px-6 py-12">
-      <div className="max-w-3xl mx-auto">
-        <div className="mb-10">
-          <button
-            onClick={() => router.push("/")}
-            className="text-sm text-gray-500 hover:text-gray-900 transition"
-          >
-            ← Back to Home
-          </button>
+      <div className="max-w-5xl mx-auto">
+        <div className="mb-14">
+          <p className="text-xs tracking-[0.25em] uppercase text-gray-500 mb-4">
+            AI in Business
+          </p>
+
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-3xl">
+              <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-gray-900 leading-tight mb-4">
+                AI in Marketing &amp; Customer Experience
+              </h1>
+
+              <p className="text-lg text-gray-600 leading-8 max-w-2xl">
+                A blog exploring how artificial intelligence is shaping
+                marketing, personalization, customer support, and modern
+                business strategy.
+              </p>
+            </div>
+
+            <div>
+              <Link href="/create-post">
+                <button className="bg-gray-900 text-white px-6 py-3 rounded-full hover:bg-gray-700 hover:scale-105 transition">
+                  + Create Post
+                </button>
+              </Link>
+            </div>
+          </div>
         </div>
 
-        <div className="bg-white border border-gray-200 rounded-3xl p-8 md:p-10 shadow-sm">
-          <p className="text-xs tracking-[0.25em] uppercase text-gray-500 mb-4">
-            Admin
-          </p>
+        <hr className="border-gray-200 mb-10" />
 
-          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900 mb-4">
-            Create a New Blog Post
-          </h1>
+        <div className="grid gap-6">
+          {allPosts.map((post) => (
+            <Link key={post.slug} href={`/posts/${post.slug}`}>
+              <article className="bg-white border border-gray-200 rounded-3xl p-8 hover:shadow-xl hover:-translate-y-1 transition duration-300">
+                {post.imageUrl && (
+                  <img
+                    src={post.imageUrl}
+                    alt={post.title}
+                    className="w-full h-56 object-cover rounded-2xl mb-4"
+                  />
+                )}
 
-          <p className="text-lg text-gray-600 leading-8 mb-8">
-            Add a new post to your AI in Business blog.
-          </p>
+                <p className="text-sm text-gray-500 mb-3">
+                  {post.date} • {post.tag} • {getReadingTime(post.body)}
+                </p>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Title
-              </label>
-              <input
-                type="text"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Enter blog post title"
-                className="w-full rounded-2xl border border-gray-300 px-4 py-3 outline-none focus:ring-2 focus:ring-gray-900"
-                required
-              />
-            </div>
+                <h2 className="text-3xl font-semibold text-gray-900 mb-3">
+                  {post.title}
+                </h2>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Tag
-              </label>
-              <input
-                type="text"
-                value={tag}
-                onChange={(e) => setTag(e.target.value)}
-                placeholder="Marketing, AI, Customer Experience..."
-                className="w-full rounded-2xl border border-gray-300 px-4 py-3 outline-none focus:ring-2 focus:ring-gray-900"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Image URL (optional)
-              </label>
-              <input
-                type="url"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                className="w-full rounded-2xl border border-gray-300 px-4 py-3 outline-none focus:ring-2 focus:ring-gray-900"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Body
-              </label>
-              <textarea
-                value={body}
-                onChange={(e) => setBody(e.target.value)}
-                placeholder="Write your blog post here..."
-                rows={10}
-                className="w-full rounded-2xl border border-gray-300 px-4 py-3 outline-none focus:ring-2 focus:ring-gray-900 resize-none"
-                required
-              />
-            </div>
-
-            {error && (
-              <p className="text-sm text-red-600 font-medium">{error}</p>
-            )}
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="bg-gray-900 text-white px-6 py-3 rounded-full hover:bg-gray-700 transition disabled:opacity-60"
-            >
-              {isSubmitting ? "Publishing..." : "Publish Post"}
-            </button>
-          </form>
+                <p className="text-gray-600 text-lg leading-8">
+                  {post.body.substring(0, 140)}...
+                </p>
+              </article>
+            </Link>
+          ))}
         </div>
       </div>
     </main>

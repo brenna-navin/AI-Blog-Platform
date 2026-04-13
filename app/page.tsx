@@ -1,4 +1,5 @@
 import Link from "next/link";
+import posts from "../data/posts.json";
 
 type Post = {
   title: string;
@@ -17,15 +18,7 @@ function getReadingTime(text: string) {
 }
 
 export default async function Home() {
-  const res = await fetch("http://localhost:3000/api/posts", {
-    cache: "no-store",
-  });
-
-  if (!res.ok) {
-    throw new Error("Failed to fetch posts");
-  }
-
-  const posts: Post[] = await res.json();
+  const allPosts = posts as Post[];
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#faf9f7] to-white px-6 py-12">
@@ -61,7 +54,7 @@ export default async function Home() {
         <hr className="border-gray-200 mb-10" />
 
         <div className="grid gap-6">
-          {posts.map((post) => (
+          {allPosts.map((post) => (
             <Link key={post.slug} href={`/posts/${post.slug}`}>
               <article className="bg-white border border-gray-200 rounded-3xl p-8 hover:shadow-xl hover:-translate-y-1 transition duration-300">
                 {post.imageUrl && (
