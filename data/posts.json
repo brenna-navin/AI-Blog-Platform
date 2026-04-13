@@ -1,0 +1,67 @@
+[
+  {
+    "title": "test 04/13",
+    "body": "test 04/13",
+    "tag": "test 04/14",
+    "imageUrl": null,
+    "date": "4/13/2026",
+    "slug": "test-0413",
+    "source": "manual"
+  },
+  {
+    "title": "test image 2 ",
+    "body": "test image 2 ",
+    "tag": "test image 2 ",
+    "imageUrl": "https://images.unsplash.com/photo-1551288049-bebda4e38f71",
+    "date": "4/7/2026",
+    "slug": "test-image-2"
+  },
+  {
+    "title": "Test Image Post",
+    "body": "testing image post ",
+    "tag": "Testing image ",
+    "imageUrl": "https://images.unsplash.com/photo-1519389950473-47ba0277781c",
+    "date": "4/7/2026",
+    "slug": "test-image-post"
+  },
+  {
+    "title": "My First Form Post",
+    "body": "This post was created from the website form",
+    "tag": "Testing",
+    "imageUrl": null,
+    "date": "4/7/2026",
+    "slug": "my-first-form-post"
+  },
+  {
+    "title": "New Blog Post",
+    "body": "This is a new post added dynamically.",
+    "tag": "Dynamic",
+    "imageUrl": null,
+    "date": "4/7/2026",
+    "slug": "new-blog-post"
+  },
+  {
+    "title": "How AI Is Changing Customer Experience",
+    "body": "AI tools are helping businesses deliver faster support, more personalized service, and better customer insights.",
+    "tag": "Customer Experience",
+    "imageUrl": null,
+    "date": "April 7, 2026",
+    "slug": "how-ai-is-changing-customer-experience"
+  },
+  {
+    "title": "AI in Marketing Automation",
+    "body": "From email campaigns to audience targeting, AI is making marketing workflows more efficient and data-driven.",
+    "tag": "Marketing",
+    "imageUrl": null,
+    "date": "April 6, 2026",
+    "slug": "ai-in-marketing-automation"
+  },
+  {
+    "title": "The Rise of AI Personalization",
+    "body": "Businesses are using AI to recommend products, customize messaging, and improve user experiences at scale.",
+    "tag": "Personalization",
+    "imageUrl": null,
+    "date": "April 5, 2026",
+    "slug": "the-rise-of-ai-personalization"
+  }
+]
