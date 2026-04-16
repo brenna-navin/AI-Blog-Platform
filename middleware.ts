@@ -4,7 +4,6 @@ export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const protectedPaths = ["/admin", "/create-post"];
-
   const isProtected = protectedPaths.some((path) =>
     pathname.startsWith(path)
   );
@@ -17,7 +16,7 @@ export function middleware(request: NextRequest) {
 
   if (authHeader) {
     const encoded = authHeader.split(" ")[1];
-    const decoded = atob(encoded);
+    const decoded = Buffer.from(encoded, "base64").toString("utf-8");
     const [username, password] = decoded.split(":");
 
     if (
