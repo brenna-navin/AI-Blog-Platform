@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { unstable_noStore as noStore } from "next/cache";
 import { supabase } from "./lib/supabase";
 
 type Post = {
+  id?: number;
   title: string;
   body: string;
   tag: string;
@@ -18,10 +20,12 @@ function getReadingTime(text: string) {
 }
 
 export default async function Home() {
+  noStore();
+
   const { data: posts, error } = await supabase
     .from("posts")
     .select("*")
-    .order("date", { ascending: false });
+    .order("id", { ascending: false });
 
   if (error) {
     console.error(error);

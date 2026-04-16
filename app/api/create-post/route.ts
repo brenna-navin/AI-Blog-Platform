@@ -19,22 +19,32 @@ export async function POST(req: Request) {
       );
     }
 
-    const { error } = await supabase.from("posts").insert([
-      {
-        title,
-        tag,
-        image_url,
-        body: postBody,
-        slug,
-        date,
-      },
-    ]);
+    const { data, error } = await supabase
+      .from("posts")
+      .insert([
+        {
+          title,
+          tag,
+          image_url: image_url || null,
+          body: postBody,
+          slug,
+          date,
+          source: "manual",
+        },
+      ])
+      .select();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json(
+        { error: error.message },
+        { status: 500 }
+      );
     }
 
-    return NextResponse.json({ message: "Post created successfully." });
+    return NextResponse.json({
+      message: "Post created successfully.",
+      post: data?.[0] ?? null,
+    });
   } catch (error) {
     return NextResponse.json(
       { error: "Server error creating post." },
