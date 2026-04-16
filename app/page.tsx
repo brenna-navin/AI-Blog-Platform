@@ -1,11 +1,11 @@
 import Link from "next/link";
-import posts from "../data/posts.json";
+import { supabase } from "./lib/supabase";
 
 type Post = {
   title: string;
   body: string;
   tag: string;
-  imageUrl?: string | null;
+  image_url?: string | null;
   date: string;
   slug: string;
 };
@@ -18,7 +18,15 @@ function getReadingTime(text: string) {
 }
 
 export default async function Home() {
-  const allPosts = posts as Post[];
+  const { data: posts, error } = await supabase
+    .from("posts")
+    .select("*")
+    .order("date", { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return <div>Error loading posts</div>;
+  }
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#faf9f7] to-white px-6 py-12">
@@ -31,7 +39,7 @@ export default async function Home() {
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div className="max-w-3xl">
               <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-gray-900 leading-tight mb-4">
-                AI in Marketing &amp; Customer Experience
+                AI in Marketing & Customer Experience
               </h1>
 
               <p className="text-lg text-gray-600 leading-8 max-w-2xl">
@@ -54,12 +62,12 @@ export default async function Home() {
         <hr className="border-gray-200 mb-10" />
 
         <div className="grid gap-6">
-          {allPosts.map((post) => (
+          {posts?.map((post) => (
             <Link key={post.slug} href={`/posts/${post.slug}`}>
               <article className="bg-white border border-gray-200 rounded-3xl p-8 hover:shadow-xl hover:-translate-y-1 transition duration-300">
-                {post.imageUrl && (
+                {post.image_url && (
                   <img
-                    src={post.imageUrl}
+                    src={post.image_url}
                     alt={post.title}
                     className="w-full h-56 object-cover rounded-2xl mb-4"
                   />

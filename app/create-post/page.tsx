@@ -1,86 +1,101 @@
-import Link from "next/link";
-import posts from "../../data/posts.json";
+"use client";
 
-type Post = {
-  title: string;
-  body: string;
-  tag: string;
-  imageUrl?: string | null;
-  date: string;
-  slug: string;
-  source?: "manual" | "automated";
-};
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-function getReadingTime(text: string) {
-  const wordsPerMinute = 200;
-  const wordCount = text.trim().split(/\s+/).filter(Boolean).length;
-  const minutes = Math.max(1, Math.ceil(wordCount / wordsPerMinute));
-  return `${minutes} min read`;
-}
+export default function CreatePostPage() {
+  const router = useRouter();
 
-export default function HomePage() {
-  const allPosts = posts as Post[];
+  const [title, setTitle] = useState("");
+  const [tag, setTag] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [body, setBody] = useState("");
+
+  const handleSubmit = async (e: any) => {
+    e.preventDefault();
+
+    const slug = title.toLowerCase().replace(/\s+/g, "-");
+    const date = new Date().toLocaleDateString();
+
+    const res = await fetch("/api/create-post", {
+      method: "POST",
+      body: JSON.stringify({
+        title,
+        tag,
+        image_url: imageUrl,
+        body,
+        slug,
+        date,
+      }),
+    });
+
+    if (res.ok) {
+      router.push("/");
+    } else {
+      alert("Error creating post");
+    }
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#faf9f7] to-white px-6 py-12">
-      <div className="max-w-5xl mx-auto">
-        <div className="mb-14">
-          <p className="text-xs tracking-[0.25em] uppercase text-gray-500 mb-4">
-            AI in Business
-          </p>
+      <div className="max-w-3xl mx-auto">
+        <p className="text-xs tracking-[0.25em] uppercase text-gray-500 mb-4">
+          AI in Business
+        </p>
 
-          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
-            <div className="max-w-3xl">
-              <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-gray-900 leading-tight mb-4">
-                AI in Marketing &amp; Customer Experience
-              </h1>
+        <h1 className="text-5xl font-bold text-gray-900 mb-6">
+          Create a New Post
+        </h1>
 
-              <p className="text-lg text-gray-600 leading-8 max-w-2xl">
-                A blog exploring how artificial intelligence is shaping
-                marketing, personalization, customer support, and modern
-                business strategy.
-              </p>
-            </div>
+        <p className="text-gray-600 mb-10">
+          Add a new blog post to your AI in Business website.
+        </p>
 
-            <div>
-              <Link href="/create-post">
-                <button className="bg-gray-900 text-white px-6 py-3 rounded-full hover:bg-gray-700 hover:scale-105 transition">
-                  + Create Post
-                </button>
-              </Link>
-            </div>
-          </div>
-        </div>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Title */}
+          <input
+            type="text"
+            placeholder="Enter post title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full border border-gray-300 rounded-2xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
+          />
 
-        <hr className="border-gray-200 mb-10" />
+          {/* Tag */}
+          <input
+            type="text"
+            placeholder="Example: AI Trends"
+            value={tag}
+            onChange={(e) => setTag(e.target.value)}
+            className="w-full border border-gray-300 rounded-2xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
+          />
 
-        <div className="grid gap-6">
-          {allPosts.map((post) => (
-            <Link key={post.slug} href={`/posts/${post.slug}`}>
-              <article className="bg-white border border-gray-200 rounded-3xl p-8 hover:shadow-xl hover:-translate-y-1 transition duration-300">
-                {post.imageUrl && (
-                  <img
-                    src={post.imageUrl}
-                    alt={post.title}
-                    className="w-full h-56 object-cover rounded-2xl mb-4"
-                  />
-                )}
+          {/* Image URL */}
+          <input
+            type="text"
+            placeholder="Paste image URL (optional)"
+            value={imageUrl}
+            onChange={(e) => setImageUrl(e.target.value)}
+            className="w-full border border-gray-300 rounded-2xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
+          />
 
-                <p className="text-sm text-gray-500 mb-3">
-                  {post.date} • {post.tag} • {getReadingTime(post.body)}
-                </p>
+          {/* Body */}
+          <textarea
+            placeholder="Write your post here..."
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            rows={6}
+            className="w-full border border-gray-300 rounded-2xl px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
+          />
 
-                <h2 className="text-3xl font-semibold text-gray-900 mb-3">
-                  {post.title}
-                </h2>
-
-                <p className="text-gray-600 text-lg leading-8">
-                  {post.body.substring(0, 140)}...
-                </p>
-              </article>
-            </Link>
-          ))}
-        </div>
+          {/* Submit */}
+          <button
+            type="submit"
+            className="bg-gray-900 text-white px-6 py-3 rounded-full hover:bg-gray-700 transition"
+          >
+            Publish Post
+          </button>
+        </form>
       </div>
     </main>
   );
