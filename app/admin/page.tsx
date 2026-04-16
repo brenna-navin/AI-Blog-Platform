@@ -19,7 +19,7 @@ export default function AdminPage() {
 
   async function fetchPosts() {
     try {
-      const res = await fetch("/api/admin-posts", {
+      const res = await fetch("/api/posts", {
         cache: "no-store",
       });
 
