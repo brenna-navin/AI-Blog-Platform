@@ -1,51 +1,57 @@
 import { notFound } from "next/navigation";
+import { supabase } from "../../lib/supabase";
 
 type Post = {
-  id: number;
+  id?: number;
   title: string;
   body: string;
   tag: string;
-  slug: string;
-  date: string;
   image_url?: string | null;
+  date: string;
+  slug: string;
 };
 
 export default async function PostPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
-  // 🔥 FIX: remove timestamp from slug
-  const cleanSlug = params.slug.split("-").slice(0, -1).join("-");
+  const { slug } = await params;
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || ""}/api/posts`, {
-    cache: "no-store",
-  });
+  const { data: post, error } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("slug", slug)
+    .single();
 
-  const data = await res.json();
-
-  const post = data.posts.find((p: Post) => p.slug === cleanSlug);
-
-  if (!post) return notFound();
+  if (error || !post) {
+    notFound();
+  }
 
   return (
-    <main className="max-w-3xl mx-auto px-6 py-12">
-      <h1 className="text-4xl font-bold mb-4">{post.title}</h1>
+    <main className="min-h-screen bg-gradient-to-b from-[#faf9f7] to-white px-6 py-12">
+      <div className="max-w-3xl mx-auto">
+        <article className="bg-white border border-gray-200 rounded-3xl p-8 md:p-12 shadow-sm">
+          <p className="text-sm text-gray-500 mb-4">
+            {post.date} • {post.tag}
+          </p>
 
-      <p className="text-gray-500 mb-6">
-        {post.date} • {post.tag}
-      </p>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-gray-900 leading-tight mb-6">
+            {post.title}
+          </h1>
 
-      {post.image_url && (
-        <img
-          src={post.image_url}
-          alt={post.title}
-          className="w-full h-72 object-cover rounded-2xl mb-8"
-        />
-      )}
+          {post.image_url && (
+            <img
+              src={post.image_url}
+              alt={post.title}
+              className="w-full h-72 object-cover rounded-2xl mb-8"
+            />
+          )}
 
-      <div className="text-lg leading-8 whitespace-pre-line text-gray-700">
-        {post.body}
+          <div className="text-lg leading-8 text-gray-700 whitespace-pre-line">
+            {post.body}
+          </div>
+        </article>
       </div>
     </main>
   );
