@@ -24,7 +24,7 @@ export default function AdminPage() {
       });
 
       const data = await res.json();
-      setPosts(data.posts || []);
+      setPosts(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error loading posts:", error);
     } finally {
@@ -118,6 +118,14 @@ export default function AdminPage() {
                 key={post.id}
                 className="bg-white border border-gray-200 rounded-3xl p-8 shadow-sm"
               >
+                {post.image_url && (
+                  <img
+                    src={post.image_url}
+                    alt={post.title}
+                    className="w-full h-[260px] object-cover rounded-2xl mb-6"
+                  />
+                )}
+
                 <p className="text-sm text-gray-500 mb-3">
                   {post.date} • {post.tag}
                 </p>
