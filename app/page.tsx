@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 
 type Post = {
   id?: string;
@@ -9,74 +10,84 @@ type Post = {
   date: string;
 };
 
-export default async function Home() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/posts`, {
+async function getPosts(): Promise<Post[]> {
+  const headersList = await headers();
+  const host = headersList.get("host");
+
+  const protocol = host?.includes("localhost") ? "http" : "https";
+  const baseUrl = `${protocol}://${host}`;
+
+  const res = await fetch(`${baseUrl}/api/posts`, {
     cache: "no-store",
   });
 
-  const posts: Post[] = await res.json();
+  if (!res.ok) {
+    throw new Error("Failed to fetch posts");
+  }
+
+  return res.json();
+}
+
+export default async function Home() {
+  const posts = await getPosts();
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#faf9f7] to-white px-6 py-12">
-      <div className="max-w-5xl mx-auto">
-        {/* HEADER */}
+      <div className="mx-auto max-w-5xl">
         <div className="mb-14">
-          <p className="text-xs tracking-[0.25em] uppercase text-gray-500 mb-4">
+          <p className="mb-4 text-xs uppercase tracking-[0.25em] text-gray-500">
             AI IN BUSINESS
           </p>
 
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div className="max-w-3xl">
-              <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-gray-900 leading-tight mb-4">
+              <h1 className="mb-4 text-5xl font-bold leading-tight tracking-tight text-gray-900 md:text-6xl">
                 AI in Marketing & Customer Experience
               </h1>
 
-              <p className="text-lg text-gray-600 leading-relaxed">
+              <p className="text-lg leading-relaxed text-gray-600">
                 A blog exploring how artificial intelligence is shaping
                 marketing, personalization, customer support, and modern
                 business strategy.
               </p>
             </div>
-
-            {/* ❌ CREATE POST BUTTON REMOVED */}
           </div>
         </div>
 
-        {/* POSTS */}
         <div className="grid gap-10">
-          {posts.map((post, index) => (
-            <Link
-              key={index}
-              href={`/posts/${post.title
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, "-")}`}
-              className="group"
-            >
-              <div className="rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg transition">
-                {post.imageUrl && (
-                  <img
-                    src={post.imageUrl}
-                    alt={post.title}
-                    className="w-full h-[300px] object-cover"
-                  />
-                )}
+          {posts.map((post, index) => {
+            const slug = post.title
+              .toLowerCase()
+              .trim()
+              .replace(/[^a-z0-9]+/g, "-")
+              .replace(/^-+|-+$/g, "");
 
-                <div className="p-6">
-                  <p className="text-sm text-gray-500 mb-2">
-                    {post.date} • {post.tag} • 2 min read
-                  </p>
+            return (
+              <Link key={post.id ?? index} href={`/posts/${slug}`} className="group">
+                <article className="overflow-hidden rounded-2xl border border-gray-200 transition hover:shadow-lg">
+                  {post.imageUrl && (
+                    <img
+                      src={post.imageUrl}
+                      alt={post.title}
+                      className="h-[300px] w-full object-cover"
+                    />
+                  )}
 
-                  <h2 className="text-2xl font-semibold text-gray-900 group-hover:underline mb-3">
-                    {post.title}
-                  </h2>
+                  <div className="p-6">
+                    <p className="mb-2 text-sm text-gray-500">
+                      {post.date} • {post.tag} • 2 min read
+                    </p>
 
-                  <p className="text-gray-600 line-clamp-3">
-                    {post.body}
-                  </p>
-                </div>
-              </div>
-            </Link>
-          ))}
+                    <h2 className="mb-3 text-2xl font-semibold text-gray-900 group-hover:underline">
+                      {post.title}
+                    </h2>
+
+                    <p className="line-clamp-3 text-gray-600">{post.body}</p>
+                  </div>
+                </article>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </main>
