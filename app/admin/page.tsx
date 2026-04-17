@@ -67,21 +67,35 @@ export default function AdminPage() {
     }
   }
 
+  async function handleLogout() {
+    await fetch("/api/logout", { method: "POST" });
+    window.location.href = "/login";
+  }
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#faf9f7] to-white px-6 py-12">
       <div className="max-w-5xl mx-auto">
-        <div className="mb-10">
-          <p className="text-xs tracking-[0.25em] uppercase text-gray-500 mb-4">
-            AI in Business
-          </p>
+        <div className="flex items-start justify-between gap-4 mb-10">
+          <div>
+            <p className="text-xs tracking-[0.25em] uppercase text-gray-500 mb-4">
+              AI in Business
+            </p>
 
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">
-            Admin Dashboard
-          </h1>
+            <h1 className="text-5xl font-bold text-gray-900 mb-4">
+              Admin Dashboard
+            </h1>
 
-          <p className="text-lg text-gray-600">
-            Manage your blog posts here.
-          </p>
+            <p className="text-lg text-gray-600">
+              Manage your blog posts here.
+            </p>
+          </div>
+
+          <button
+            onClick={handleLogout}
+            className="bg-gray-200 text-gray-900 px-5 py-2 rounded-full hover:bg-gray-300 transition"
+          >
+            Log Out
+          </button>
         </div>
 
         {loading ? (

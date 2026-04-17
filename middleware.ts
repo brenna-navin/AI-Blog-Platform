@@ -1,38 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 
+const protectedRoutes = ["/admin", "/create-post"];
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const protectedPaths = ["/admin", "/create-post"];
-  const isProtected = protectedPaths.some((path) =>
-    pathname.startsWith(path)
+  const isProtected = protectedRoutes.some((route) =>
+    pathname.startsWith(route)
   );
 
   if (!isProtected) {
     return NextResponse.next();
   }
 
-  const authHeader = request.headers.get("authorization");
+  const isLoggedIn = request.cookies.get("admin-auth")?.value === "true";
 
-  if (authHeader) {
-    const encoded = authHeader.split(" ")[1];
-    const decoded = Buffer.from(encoded, "base64").toString("utf-8");
-    const [username, password] = decoded.split(":");
-
-    if (
-      username === process.env.ADMIN_USERNAME &&
-      password === process.env.ADMIN_PASSWORD
-    ) {
-      return NextResponse.next();
-    }
+  if (!isLoggedIn) {
+    const loginUrl = new URL("/login", request.url);
+    return NextResponse.redirect(loginUrl);
   }
 
-  return new NextResponse("Authentication required", {
-    status: 401,
-    headers: {
-      "WWW-Authenticate": 'Basic realm="Secure Area"',
-    },
-  });
+  return NextResponse.next();
 }
 
 export const config = {
