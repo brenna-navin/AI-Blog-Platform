@@ -138,12 +138,19 @@ export default function AdminPage() {
                   {post.body.substring(0, 140)}...
                 </p>
 
-                <div className="flex gap-3">
+                <div className="flex gap-3 flex-wrap">
                   <a
                     href={`/posts/${post.slug}`}
                     className="bg-gray-200 text-gray-900 px-5 py-2 rounded-full hover:bg-gray-300 transition"
                   >
                     View
+                  </a>
+
+                  <a
+                    href={`/admin/edit-post/${post.id}`}
+                    className="bg-blue-600 text-white px-5 py-2 rounded-full hover:bg-blue-700 transition"
+                  >
+                    Edit
                   </a>
 
                   <button
