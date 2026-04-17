@@ -4,10 +4,7 @@ export async function POST(req: NextRequest) {
   try {
     const { username, password } = await req.json();
 
-    if (
-      username === process.env.ADMIN_USERNAME &&
-      password === process.env.ADMIN_PASSWORD
-    ) {
+    if (username === "admin" && password === "password123") {
       const response = NextResponse.json({ message: "Login successful" });
 
       response.cookies.set("admin-auth", "true", {

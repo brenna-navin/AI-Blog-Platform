@@ -90,12 +90,21 @@ export default function AdminPage() {
             </p>
           </div>
 
-          <button
-            onClick={handleLogout}
-            className="bg-gray-200 text-gray-900 px-5 py-2 rounded-full hover:bg-gray-300 transition"
-          >
-            Log Out
-          </button>
+          <div className="flex gap-3">
+            <a
+              href="/create-post"
+              className="bg-gray-900 text-white px-5 py-2 rounded-full hover:bg-gray-700 transition"
+            >
+              + Create Post
+            </a>
+
+            <button
+              onClick={handleLogout}
+              className="bg-gray-200 text-gray-900 px-5 py-2 rounded-full hover:bg-gray-300 transition"
+            >
+              Log Out
+            </button>
+          </div>
         </div>
 
         {loading ? (
