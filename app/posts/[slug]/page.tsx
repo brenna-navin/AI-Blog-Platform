@@ -2,22 +2,17 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 
+export const dynamic = "force-dynamic";
+
 type Post = {
   id?: number;
   title: string;
   body: string;
   tag: string;
-  imageUrl?: string | null;
+  slug: string;
+  image_url?: string | null;
   date: string;
 };
-
-function slugify(title: string) {
-  return title
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
-}
 
 async function getPostBySlug(slug: string): Promise<Post | null> {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -30,16 +25,18 @@ async function getPostBySlug(slug: string): Promise<Post | null> {
 
   const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
-  const { data, error } = await supabase.from("posts").select("*");
+  const { data, error } = await supabase
+    .from("posts")
+    .select("*")
+    .eq("slug", slug)
+    .single();
 
   if (error) {
     console.error("Supabase error:", error.message);
     return null;
   }
 
-  const post = (data as Post[]).find((p) => slugify(p.title) === slug);
-
-  return post ?? null;
+  return data as Post;
 }
 
 export default async function PostPage({
@@ -72,9 +69,9 @@ export default async function PostPage({
           {post.title}
         </h1>
 
-        {post.imageUrl && (
+        {post.image_url && (
           <img
-            src={post.imageUrl}
+            src={post.image_url}
             alt={post.title}
             className="mb-8 h-[400px] w-full rounded-2xl object-cover"
           />
